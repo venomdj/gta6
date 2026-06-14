@@ -857,39 +857,50 @@ tr:hover td{background:var(--bg3);}
 <!-- ─── TOAST ─── -->
 <div class="toast" id="toast"></div>
 
-<!-- Firebase -->
-<script type="module">
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
-import { getFirestore, collection, addDoc, getDocs, doc, getDoc, setDoc, updateDoc, increment, serverTimestamp, onSnapshot, query, orderBy }
-  from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+<!-- Firebase via Realtime Database REST API (no SDK needed, works everywhere) -->
+<script>
+const DB_URL = 'https://gta6-bbcb5-default-rtdb.firebaseio.com';
 
-// ── FIREBASE CONFIG ──────────────────────────────────────────────
-// 🔴 REPLACE WITH YOUR FIREBASE CONFIG 🔴
-const firebaseConfig = {
-  apiKey: "AIzaSyDRRvC4hA2V4OzsMQdAc4w8IPBS73IDfDQ",
-  authDomain: "gta6-bbcb5.firebaseapp.com",
-  databaseURL: "https://gta6-bbcb5-default-rtdb.firebaseio.com",
-  projectId: "gta6-bbcb5",
-  storageBucket: "gta6-bbcb5.firebasestorage.app",
-  messagingSenderId: "483183473019",
-  appId: "1:483183473019:web:3da57a198c3a1d7c8f4dde",
-  measurementId: "G-3DGKH6BHRY"
-};
-// ─────────────────────────────────────────────────────────────────
+// ── HELPERS ───────────────────────────────────────────────────────
+async function dbGet(path) {
+  const r = await fetch(`${DB_URL}/${path}.json`);
+  return r.ok ? r.json() : null;
+}
+async function dbSet(path, data) {
+  const r = await fetch(`${DB_URL}/${path}.json`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  });
+  return r.ok;
+}
+async function dbPush(path, data) {
+  const r = await fetch(`${DB_URL}/${path}.json`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  });
+  return r.ok ? r.json() : null;
+}
+async function dbUpdate(path, data) {
+  const r = await fetch(`${DB_URL}/${path}.json`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  });
+  return r.ok ? r.json() : null;
+}
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
-// ── COUNTERS ─────────────────────────────────────────────────────
-window._db = db;
-
+// ── COUNTERS ──────────────────────────────────────────────────────
 async function loadCounters() {
   try {
-    const snap = await getDocs(collection(db, 'signups'));
-    const docs = snap.docs.map(d => d.data());
-    document.getElementById('cnt-signup').textContent = docs.length;
-    document.getElementById('cnt-pay').textContent = '—';
-    document.getElementById('cnt-city').textContent = '—';
+    const data = await dbGet('signups');
+    const entries = data ? Object.values(data) : [];
+    document.getElementById('cnt-signup').textContent = entries.length;
+    const willPay = entries.filter(e => e.willPay).length;
+    document.getElementById('cnt-pay').textContent = willPay || '—';
+    const cities = new Set(entries.map(e => (e.city||'').toLowerCase().trim()).filter(Boolean)).size;
+    document.getElementById('cnt-city').textContent = cities || '—';
   } catch(e) {
     document.getElementById('cnt-signup').textContent = '0';
     document.getElementById('cnt-pay').textContent = '—';
@@ -898,20 +909,18 @@ async function loadCounters() {
 }
 
 // ── VOTES ─────────────────────────────────────────────────────────
-const VOTE_DOC = 'votes/global';
 let userVote = localStorage.getItem('rentplay_vote') || null;
 
 async function loadVotes() {
   try {
-    const ref = doc(db, 'votes', 'global');
-    const snap = await getDoc(ref);
-    const data = snap.exists() ? snap.data() : { up: 0, down: 0 };
-    document.getElementById('upCount').textContent = data.up || 0;
-    document.getElementById('downCount').textContent = data.down || 0;
+    const data = await dbGet('votes/global');
+    const votes = data || { up: 0, down: 0 };
+    document.getElementById('upCount').textContent = votes.up || 0;
+    document.getElementById('downCount').textContent = votes.down || 0;
     renderVoteState();
   } catch {
-    document.getElementById('upCount').textContent = '?';
-    document.getElementById('downCount').textContent = '?';
+    document.getElementById('upCount').textContent = '0';
+    document.getElementById('downCount').textContent = '0';
   }
 }
 
@@ -921,25 +930,22 @@ function renderVoteState() {
 }
 
 window.vote = async function(type) {
-  if (userVote === type) return; // already voted this
+  if (userVote === type) return;
   try {
-    const ref = doc(db, 'votes', 'global');
-    const snap = await getDoc(ref);
-    if (!snap.exists()) {
-      await setDoc(ref, { up: 0, down: 0 });
-    }
-    const updates = {};
-    updates[type] = increment(1);
+    const data = await dbGet('votes/global') || { up: 0, down: 0 };
+    data[type] = (data[type] || 0) + 1;
     if (userVote && userVote !== type) {
-      updates[userVote] = increment(-1); // remove old vote
+      data[userVote] = Math.max(0, (data[userVote] || 0) - 1);
     }
-    await updateDoc(ref, updates);
+    await dbSet('votes/global', data);
     userVote = type;
     localStorage.setItem('rentplay_vote', type);
-    await loadVotes();
+    document.getElementById('upCount').textContent = data.up;
+    document.getElementById('downCount').textContent = data.down;
+    renderVoteState();
     showToast(type === 'up' ? '👍 Thanks for the vote!' : '👎 Noted, we appreciate honesty.');
   } catch(e) {
-    showToast('Could not record vote. Check Firebase config.');
+    showToast('Could not record vote.');
   }
 };
 
@@ -947,11 +953,7 @@ window.vote = async function(type) {
 window.submitForm = async function() {
   const name = document.getElementById('f_name').value.trim();
   const errEl = document.getElementById('formErr');
-
-  if (!name) {
-    errEl.style.display = 'block';
-    return;
-  }
+  if (!name) { errEl.style.display = 'block'; return; }
   errEl.style.display = 'none';
 
   const btn = document.getElementById('subBtn');
@@ -959,19 +961,17 @@ window.submitForm = async function() {
   btn.textContent = 'Submitting…';
 
   try {
-    await addDoc(collection(db, 'signups'), {
+    await dbPush('signups', {
       name,
-      timestamp: serverTimestamp()
+      timestamp: new Date().toISOString()
     });
-
     document.getElementById('formWrap').style.display = 'none';
     document.getElementById('successWrap').style.display = 'block';
     loadCounters();
     showToast('🎉 You\'re on the waitlist!');
-
     document.getElementById('f_name').value = '';
   } catch(e) {
-    showToast('Error saving. Check Firebase config.');
+    showToast('Error saving. Try again.');
     btn.disabled = false;
     btn.textContent = 'Reserve My Spot →';
   }
@@ -987,8 +987,11 @@ window.closeAdmin = function() {
 };
 
 async function renderAdmin() {
-  const snap = await getDocs(query(collection(db, 'signups'), orderBy('timestamp', 'desc')));
-  const docs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  const data = await dbGet('signups');
+  const docs = data
+    ? Object.entries(data).map(([id, v]) => ({ id, ...v })).reverse()
+    : [];
+
   const willPay = docs.filter(d => d.willPay).length;
   const cities = new Set(docs.map(d => (d.city||'').toLowerCase().trim()).filter(Boolean)).size;
   const rate = docs.length ? Math.round((willPay / docs.length) * 100) : 0;
@@ -1007,14 +1010,14 @@ async function renderAdmin() {
     return;
   }
   body.innerHTML = docs.map((d, i) => {
-    const ts = d.timestamp?.toDate ? d.timestamp.toDate().toLocaleString('en-IN',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}) : '—';
+    const ts = d.timestamp ? new Date(d.timestamp).toLocaleString('en-IN',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}) : '—';
     return `<tr>
       <td style="color:var(--text3)">${i+1}</td>
       <td style="color:var(--text);font-weight:500">${esc(d.name)}</td>
       <td>${esc(d.email)}</td>
       <td>${esc(d.whatsapp)}</td>
       <td>${esc(d.city)}</td>
-      <td>${d.duration} day${d.duration==='1'?'':d.duration==='Not specified'?'':'s'}</td>
+      <td>${d.duration ? d.duration + ' day' + (d.duration==='1'?'':'s') : '—'}</td>
       <td>${d.willPay ? '<span class="by">✓ Yes</span>' : '<span class="bn">✗ No</span>'}</td>
       <td>${ts}</td>
     </tr>`;
@@ -1028,7 +1031,7 @@ window.exportCSV = function() {
   const rows = docs.map((d,i) => [
     i+1, d.name, d.email, d.whatsapp, d.city, d.duration,
     d.willPay ? 'Yes' : 'No',
-    d.timestamp?.toDate ? d.timestamp.toDate().toLocaleString() : ''
+    d.timestamp ? new Date(d.timestamp).toLocaleString() : ''
   ]);
   const csv = [h,...rows].map(r => r.map(v => `"${String(v||'').replace(/"/g,'""')}"`).join(',')).join('\n');
   const a = document.createElement('a');
