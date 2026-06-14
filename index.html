@@ -84,34 +84,21 @@ nav{
 }
 .btn-ghost:hover{color:var(--text);background:var(--bg3);}
 
-/* VOTE */
-.vote-wrap{display:flex;align-items:center;gap:10px;position:relative;z-index:1;justify-content:center;}
-.vote-box{display:flex;align-items:center;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);overflow:hidden;}
-.vote-btn{
-  display:flex;align-items:center;gap:7px;background:none;border:none;cursor:pointer;
-  font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:600;
-  padding:10px 20px;color:var(--text2);
-  user-select:none;
-  outline:none;
+
+
+/* PEOPLE INTERESTED */
+.ppl-interested{
+  display:flex;align-items:center;gap:10px;
+  position:relative;z-index:1;
+  margin-bottom:32px;
+  justify-content:center;
 }
-.vote-btn:hover{background:var(--bg4);}
-.vote-btn.up:hover{color:var(--green);}
-.vote-btn.down:hover{color:var(--red);}
-.vote-btn.up.active{color:var(--green) !important;background:var(--greendim) !important;}
-.vote-btn.down.active{color:var(--red) !important;background:var(--reddim) !important;}
-.vote-btn.up.active .ve{filter:drop-shadow(0 0 6px rgba(0,229,160,1));}
-.vote-btn.down.active .ve{filter:drop-shadow(0 0 6px rgba(255,68,85,1));}
-.ve{font-size:17px;line-height:1;display:inline-block;}
-.vote-sep{width:1px;background:var(--border2);height:22px;flex-shrink:0;}
-.vote-label{font-size:12px;color:var(--text3);}
-@keyframes votepop{
-  0%  {transform:scale(1)}
-  30% {transform:scale(1.3)}
-  60% {transform:scale(0.9)}
-  80% {transform:scale(1.08)}
-  100%{transform:scale(1)}
+.cnum-inline{
+  font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:28px;
+  color:var(--green);
+  text-shadow:0 0 20px rgba(0,229,160,0.5),0 0 40px rgba(0,229,160,0.2);
 }
-.vote-btn.popping{animation:votepop .4s ease forwards;}
+.cnum-label{font-size:13px;color:var(--text3);letter-spacing:0.2px;}
 
 /* CONSOLE CARD */
 .console-card{
@@ -311,7 +298,6 @@ footer{
   .cta-row{flex-direction:column;align-items:stretch;}
   .btn-main,.btn-ghost{justify-content:center;}
   nav .nav-pill span{display:none;}
-  .vote-wrap{flex-direction:column;gap:8px;}
 }
 @media(max-width:380px){
   .steps{grid-template-columns:1fr;}
@@ -335,18 +321,6 @@ footer{
     <button class="btn-main" onclick="openModal()">🎮 I'm Interested — Reserve My Spot</button>
     <a href="#how" class="btn-ghost">See how it works ↓</a>
   </div>
-  <div class="vote-wrap">
-    <div class="vote-box">
-      <button class="vote-btn up" id="upBtn" onclick="vote('up')" title="I'd use this">
-        <span class="ve">👍</span><span id="upCount">0</span>
-      </button>
-      <div class="vote-sep"></div>
-      <button class="vote-btn down" id="downBtn" onclick="vote('down')" title="Not for me">
-        <span class="ve">👎</span><span id="downCount">0</span>
-      </button>
-    </div>
-    <span class="vote-label">Would you use this?</span>
-  </div>
   <div class="console-card">
     <div class="c-emoji">🎮</div>
     <div>
@@ -357,9 +331,6 @@ footer{
   </div>
 </section>
 
-<!-- COUNTER BAR -->
-<div class="cbar">
-  <div class="citem"><span class="cnum" id="cnt-signup">—</span><div class="clabel">People Interested</div></div>
 </div>
 
 <div class="wrap">
@@ -567,82 +538,22 @@ async function loadCounter() {
 loadCounter();
 
 // ── VOTES ─────────────────────────────────────────────────────────
-let userVote = localStorage.getItem('rentplay_vote') || null;
-const votesRef = doc(db, 'votes', 'global');
-let voting = false;
 
 // Init votes doc if it doesn't exist, then listen
-async function initVotes() {
-  const snap = await getDoc(votesRef);
   if (!snap.exists()) {
-    await setDoc(votesRef, { up: 0, down: 0 });
   }
   // Now listen for real-time updates
-  onSnapshot(votesRef, snap => {
     const d = snap.data() || { up: 0, down: 0 };
-    document.getElementById('upCount').textContent = Math.max(0, d.up || 0);
-    document.getElementById('downCount').textContent = Math.max(0, d.down || 0);
     // re-apply active state on every snapshot (keeps it in sync)
-    document.getElementById('upBtn').classList.toggle('active', userVote === 'up');
-    document.getElementById('downBtn').classList.toggle('active', userVote === 'down');
   });
 }
-initVotes();
 
-window.vote = async function(type) {
-  if (voting) return;
-  // Toggle off if same vote
-  if (userVote === type) {
-    voting = true;
-    const prevVote = userVote;
-    userVote = null;
-    localStorage.removeItem('rentplay_vote');
-    document.getElementById('upBtn').classList.remove('active');
-    document.getElementById('downBtn').classList.remove('active');
-    try {
-      await updateDoc(votesRef, { [prevVote]: increment(-1) });
-    } catch(e) {
-      userVote = prevVote;
-      document.getElementById(prevVote + 'Btn').classList.add('active');
-    } finally { voting = false; }
-    return;
-  }
-
-  voting = true;
-  const prevVote = userVote;
-  userVote = type;
-  localStorage.setItem('rentplay_vote', type);
-
-  // Instant UI — no waiting for Firebase
-  document.getElementById('upBtn').classList.toggle('active', type === 'up');
-  document.getElementById('downBtn').classList.toggle('active', type === 'down');
-
-  // Pop animation — clean restart every time
-  const btn = document.getElementById(type === 'up' ? 'upBtn' : 'downBtn');
-  btn.classList.remove('popping');
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => {
-      btn.classList.add('popping');
-      btn.addEventListener('animationend', () => btn.classList.remove('popping'), { once: true });
-    });
-  });
-
-  try {
-    const updates = { [type]: increment(1) };
-    if (prevVote) updates[prevVote] = increment(-1);
     // Use setDoc with merge so it works even if doc somehow vanishes
-    await setDoc(votesRef, updates, { merge: true });
-    localStorage.setItem('rentplay_vote', type);
     showToast(type === 'up' ? '👍 Thanks for the vote!' : '👎 Noted — honesty helps us.');
   } catch(e) {
     // rollback
-    userVote = prevVote;
-    localStorage[prevVote ? 'setItem' : 'removeItem']('rentplay_vote', prevVote || '');
-    document.getElementById('upBtn').classList.toggle('active', prevVote === 'up');
-    document.getElementById('downBtn').classList.toggle('active', prevVote === 'down');
     showToast('Vote failed — check connection.');
   } finally {
-    voting = false;
   }
 };
 
