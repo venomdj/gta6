@@ -91,34 +91,27 @@ nav{
   display:flex;align-items:center;gap:7px;background:none;border:none;cursor:pointer;
   font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:600;
   padding:10px 20px;color:var(--text2);
-  transition:background .15s,color .15s,box-shadow .15s;
-  will-change:transform;
   user-select:none;
+  outline:none;
 }
-.vote-btn:not(.active):hover{background:var(--bg4);}
-.vote-btn.up:not(.active):hover{color:var(--green);}
-.vote-btn.down:not(.active):hover{color:var(--red);}
-.vote-btn.up.active{
-  color:var(--green);background:var(--greendim);
-  box-shadow:inset 0 0 0 1px rgba(0,229,160,0.25);
-}
-.vote-btn.down.active{
-  color:var(--red);background:var(--reddim);
-  box-shadow:inset 0 0 0 1px rgba(255,68,85,0.25);
-}
-.vote-btn.up.active .ve{filter:drop-shadow(0 0 5px rgba(0,229,160,0.9));}
-.vote-btn.down.active .ve{filter:drop-shadow(0 0 5px rgba(255,68,85,0.9));}
-.ve{font-size:17px;line-height:1;display:inline-block;transition:filter .2s;}
+.vote-btn:hover{background:var(--bg4);}
+.vote-btn.up:hover{color:var(--green);}
+.vote-btn.down:hover{color:var(--red);}
+.vote-btn.up.active{color:var(--green) !important;background:var(--greendim) !important;}
+.vote-btn.down.active{color:var(--red) !important;background:var(--reddim) !important;}
+.vote-btn.up.active .ve{filter:drop-shadow(0 0 6px rgba(0,229,160,1));}
+.vote-btn.down.active .ve{filter:drop-shadow(0 0 6px rgba(255,68,85,1));}
+.ve{font-size:17px;line-height:1;display:inline-block;}
 .vote-sep{width:1px;background:var(--border2);height:22px;flex-shrink:0;}
 .vote-label{font-size:12px;color:var(--text3);}
-@keyframes pop{
+@keyframes votepop{
   0%  {transform:scale(1)}
-  25% {transform:scale(1.25)}
-  55% {transform:scale(0.92)}
-  75% {transform:scale(1.07)}
+  30% {transform:scale(1.3)}
+  60% {transform:scale(0.9)}
+  80% {transform:scale(1.08)}
   100%{transform:scale(1)}
 }
-.vote-btn.pop{animation:pop .38s cubic-bezier(.36,.07,.19,.97) both;}
+.vote-btn.popping{animation:votepop .4s ease forwards;}
 
 /* CONSOLE CARD */
 .console-card{
@@ -573,78 +566,81 @@ async function loadCounter() {
 }
 loadCounter();
 
-// ── LIVE VOTES ────────────────────────────────────────────────────
+// ── VOTES ─────────────────────────────────────────────────────────
 let userVote = localStorage.getItem('rentplay_vote') || null;
-
 const votesRef = doc(db, 'votes', 'global');
-
-// ensure votes doc exists then listen
-getDoc(votesRef).then(snap => {
-  if (!snap.exists()) setDoc(votesRef, { up: 0, down: 0 });
-});
-
-// track running animations to cancel them
-const _anims = {};
-
-function setCount(id, to) {
-  const el = document.getElementById(id);
-  const from = parseInt(el.textContent) || 0;
-  if (from === to) return;
-  if (_anims[id]) cancelAnimationFrame(_anims[id]);
-  const duration = 300;
-  const start = performance.now();
-  function step(now) {
-    const p = Math.min((now - start) / duration, 1);
-    const ease = 1 - Math.pow(1 - p, 3); // ease out cubic
-    el.textContent = Math.round(from + (to - from) * ease);
-    if (p < 1) _anims[id] = requestAnimationFrame(step);
-    else { el.textContent = to; delete _anims[id]; }
-  }
-  _anims[id] = requestAnimationFrame(step);
-}
-
-function applyVoteUI(data) {
-  setCount('upCount', data.up || 0);
-  setCount('downCount', data.down || 0);
-  document.getElementById('upBtn').classList.toggle('active', userVote === 'up');
-  document.getElementById('downBtn').classList.toggle('active', userVote === 'down');
-}
-
-onSnapshot(votesRef, snap => {
-  applyVoteUI(snap.exists() ? snap.data() : { up: 0, down: 0 });
-});
-
-// ── VOTE ──────────────────────────────────────────────────────────
 let voting = false;
-window.vote = async function(type) {
-  if (userVote === type || voting) return;
-  voting = true;
 
-  // optimistic UI update immediately
+// Init votes doc if it doesn't exist, then listen
+async function initVotes() {
+  const snap = await getDoc(votesRef);
+  if (!snap.exists()) {
+    await setDoc(votesRef, { up: 0, down: 0 });
+  }
+  // Now listen for real-time updates
+  onSnapshot(votesRef, snap => {
+    const d = snap.data() || { up: 0, down: 0 };
+    document.getElementById('upCount').textContent = Math.max(0, d.up || 0);
+    document.getElementById('downCount').textContent = Math.max(0, d.down || 0);
+    // re-apply active state on every snapshot (keeps it in sync)
+    document.getElementById('upBtn').classList.toggle('active', userVote === 'up');
+    document.getElementById('downBtn').classList.toggle('active', userVote === 'down');
+  });
+}
+initVotes();
+
+window.vote = async function(type) {
+  if (voting) return;
+  // Toggle off if same vote
+  if (userVote === type) {
+    voting = true;
+    const prevVote = userVote;
+    userVote = null;
+    localStorage.removeItem('rentplay_vote');
+    document.getElementById('upBtn').classList.remove('active');
+    document.getElementById('downBtn').classList.remove('active');
+    try {
+      await updateDoc(votesRef, { [prevVote]: increment(-1) });
+    } catch(e) {
+      userVote = prevVote;
+      document.getElementById(prevVote + 'Btn').classList.add('active');
+    } finally { voting = false; }
+    return;
+  }
+
+  voting = true;
   const prevVote = userVote;
   userVote = type;
+  localStorage.setItem('rentplay_vote', type);
+
+  // Instant UI — no waiting for Firebase
   document.getElementById('upBtn').classList.toggle('active', type === 'up');
   document.getElementById('downBtn').classList.toggle('active', type === 'down');
 
-  // pop only the clicked button
+  // Pop animation — clean restart every time
   const btn = document.getElementById(type === 'up' ? 'upBtn' : 'downBtn');
-  btn.classList.remove('pop');
-  void btn.offsetWidth; // force reflow so animation restarts clean
-  btn.classList.add('pop');
-  btn.addEventListener('animationend', () => btn.classList.remove('pop'), { once: true });
+  btn.classList.remove('popping');
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      btn.classList.add('popping');
+      btn.addEventListener('animationend', () => btn.classList.remove('popping'), { once: true });
+    });
+  });
 
   try {
     const updates = { [type]: increment(1) };
     if (prevVote) updates[prevVote] = increment(-1);
-    await updateDoc(votesRef, updates);
+    // Use setDoc with merge so it works even if doc somehow vanishes
+    await setDoc(votesRef, updates, { merge: true });
     localStorage.setItem('rentplay_vote', type);
     showToast(type === 'up' ? '👍 Thanks for the vote!' : '👎 Noted — honesty helps us.');
   } catch(e) {
-    // rollback optimistic update
+    // rollback
     userVote = prevVote;
+    localStorage[prevVote ? 'setItem' : 'removeItem']('rentplay_vote', prevVote || '');
     document.getElementById('upBtn').classList.toggle('active', prevVote === 'up');
     document.getElementById('downBtn').classList.toggle('active', prevVote === 'down');
-    showToast('Vote failed: ' + e.message);
+    showToast('Vote failed — check connection.');
   } finally {
     voting = false;
   }
