@@ -99,6 +99,8 @@ nav{
 .vote-btn.down.active{color:var(--red);background:var(--reddim);}
 .vote-sep{width:1px;background:var(--border2);height:20px;flex-shrink:0;}
 .vote-label{font-size:12px;color:var(--text3);}
+@keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.28)}70%{transform:scale(0.92)}100%{transform:scale(1)}}
+.vote-btn.pop{animation:pop .3s cubic-bezier(.36,.07,.19,.97) both;}
 
 /* CONSOLE CARD */
 .console-card{
@@ -525,92 +527,108 @@ footer{
 <!-- Firebase -->
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
-import { getFirestore, collection, addDoc, getDocs, doc, getDoc, setDoc, updateDoc, increment, serverTimestamp, query, orderBy }
-  from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+import {
+  getDatabase, ref, set, get, update, increment, push, onValue
+} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js';
 
-// 🔴 REPLACE WITH YOUR FIREBASE CONFIG
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT.appspot.com",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyDRRvC4hA2V4OzsMQdAc4w8IPBS73IDfDQ",
+  authDomain: "gta6-bbcb5.firebaseapp.com",
+  databaseURL: "https://gta6-bbcb5-default-rtdb.firebaseio.com",
+  projectId: "gta6-bbcb5",
+  storageBucket: "gta6-bbcb5.firebasestorage.app",
+  messagingSenderId: "483183473019",
+  appId: "1:483183473019:web:3da57a198c3a1d7c8f4dde",
+  measurementId: "G-3DGKH6BHRY"
 };
 
 const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-window._db = db;
+const db = getDatabase(app);
 
-// COUNTERS
-async function loadCounters() {
-  try {
-    const snap = await getDocs(collection(db, 'signups'));
-    const docs = snap.docs.map(d => d.data());
-    document.getElementById('cnt-signup').textContent = docs.length;
-  } catch {
-    document.getElementById('cnt-signup').textContent = '0';
-  }
-}
+// ── LIVE COUNTER (real-time listener) ────────────────────────────
+onValue(ref(db, 'meta/signupCount'), snap => {
+  document.getElementById('cnt-signup').textContent = snap.val() || 0;
+});
 
-// VOTES
+// ── LIVE VOTES (real-time listener) ──────────────────────────────
 let userVote = localStorage.getItem('rentplay_vote') || null;
 
-async function loadVotes() {
-  try {
-    const snap = await getDoc(doc(db, 'votes', 'global'));
-    const data = snap.exists() ? snap.data() : { up: 0, down: 0 };
-    document.getElementById('upCount').textContent = data.up || 0;
-    document.getElementById('downCount').textContent = data.down || 0;
-    document.getElementById('upBtn').classList.toggle('active', userVote === 'up');
-    document.getElementById('downBtn').classList.toggle('active', userVote === 'down');
-  } catch {
-    document.getElementById('upCount').textContent = '0';
-    document.getElementById('downCount').textContent = '0';
-  }
+onValue(ref(db, 'votes'), snap => {
+  const data = snap.val() || { up: 0, down: 0 };
+  animateCount('upCount', parseInt(document.getElementById('upCount').dataset.val || 0), data.up || 0);
+  animateCount('downCount', parseInt(document.getElementById('downCount').dataset.val || 0), data.down || 0);
+  document.getElementById('upCount').dataset.val = data.up || 0;
+  document.getElementById('downCount').dataset.val = data.down || 0;
+  document.getElementById('upBtn').classList.toggle('active', userVote === 'up');
+  document.getElementById('downBtn').classList.toggle('active', userVote === 'down');
+});
+
+function animateCount(id, from, to) {
+  const el = document.getElementById(id);
+  if (from === to) { el.textContent = to; return; }
+  const diff = to - from;
+  const duration = 400;
+  const start = performance.now();
+  requestAnimationFrame(function step(now) {
+    const p = Math.min((now - start) / duration, 1);
+    el.textContent = Math.round(from + diff * p);
+    if (p < 1) requestAnimationFrame(step);
+  });
 }
 
+// ── VOTE ─────────────────────────────────────────────────────────
 window.vote = async function(type) {
   if (userVote === type) return;
+  const btn = document.getElementById(type === 'up' ? 'upBtn' : 'downBtn');
+
+  // pop animation
+  btn.classList.add('pop');
+  setTimeout(() => btn.classList.remove('pop'), 300);
+
   try {
-    const ref = doc(db, 'votes', 'global');
-    const snap = await getDoc(ref);
-    if (!snap.exists()) await setDoc(ref, { up: 0, down: 0 });
-    const updates = { [type]: increment(1) };
-    if (userVote) updates[userVote] = increment(-1);
-    await updateDoc(ref, updates);
+    const updates = { [`votes/${type}`]: increment(1) };
+    if (userVote) updates[`votes/${userVote}`] = increment(-1);
+    await update(ref(db), updates);
     userVote = type;
     localStorage.setItem('rentplay_vote', type);
-    await loadVotes();
-    showToast(type === 'up' ? '👍 Thanks!' : '👎 Noted, we appreciate the honesty.');
-  } catch {
-    showToast('Could not record vote — check Firebase config.');
+    showToast(type === 'up' ? '👍 Thanks for the vote!' : '👎 Noted — honesty helps us.');
+  } catch(e) {
+    showToast('Vote failed: ' + e.message);
   }
 };
 
-// FORM SUBMIT
+// ── FORM SUBMIT ───────────────────────────────────────────────────
 window.submitForm = async function() {
   const name = document.getElementById('f_name').value.trim();
   const errEl = document.getElementById('ferr');
   if (!name) { errEl.style.display = 'block'; return; }
   errEl.style.display = 'none';
+
   const btn = document.getElementById('subBtn');
-  btn.disabled = true; btn.textContent = 'Submitting…';
+  btn.disabled = true;
+  btn.textContent = 'Saving…';
+
   try {
-    await addDoc(collection(db, 'signups'), { name, timestamp: serverTimestamp() });
+    // Write signup entry
+    const newRef = push(ref(db, 'signups'));
+    await set(newRef, {
+      name,
+      timestamp: Date.now()
+    });
+    // Increment counter atomically
+    await update(ref(db, 'meta'), { signupCount: increment(1) });
+
     document.getElementById('formWrap').style.display = 'none';
     document.getElementById('successWrap').style.display = 'block';
-    loadCounters();
-    showToast('🎉 You\'re on the waitlist!');
+    showToast("🎉 You're on the waitlist!");
     document.getElementById('f_name').value = '';
-  } catch {
-    showToast('Error saving — check Firebase config.');
-    btn.disabled = false; btn.textContent = 'I\'m In →';
+  } catch(e) {
+    errEl.textContent = 'Error: ' + e.message;
+    errEl.style.display = 'block';
+    btn.disabled = false;
+    btn.textContent = "I'm In →";
   }
 };
-
-loadCounters();
-loadVotes();
 </script>
 
 <script>
