@@ -321,6 +321,10 @@ footer{
     <button class="btn-main" onclick="openModal()">🎮 I'm Interested — Reserve My Spot</button>
     <a href="#how" class="btn-ghost">See how it works ↓</a>
   </div>
+  <div class="ppl-interested">
+    <span class="cnum-inline" id="cnt-signup">—</span>
+    <span class="cnum-label">people already interested</span>
+  </div>
   <div class="console-card">
     <div class="c-emoji">🎮</div>
     <div>
@@ -510,23 +514,19 @@ footer{
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
 import {
-  getFirestore, collection, addDoc, getCountFromServer,
-  doc, getDoc, setDoc, updateDoc, increment, serverTimestamp, onSnapshot
+  getFirestore, collection, addDoc, getCountFromServer, serverTimestamp
 } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 
-const firebaseConfig = {
+const app = initializeApp({
   apiKey: "AIzaSyDRRvC4hA2V4OzsMQdAc4w8IPBS73IDfDQ",
   authDomain: "gta6-bbcb5.firebaseapp.com",
   projectId: "gta6-bbcb5",
   storageBucket: "gta6-bbcb5.firebasestorage.app",
   messagingSenderId: "483183473019",
   appId: "1:483183473019:web:3da57a198c3a1d7c8f4dde"
-};
-
-const app = initializeApp(firebaseConfig);
+});
 const db = getFirestore(app);
 
-// ── LIVE COUNTER ──────────────────────────────────────────────────
 async function loadCounter() {
   try {
     const snap = await getCountFromServer(collection(db, 'signups'));
@@ -537,27 +537,6 @@ async function loadCounter() {
 }
 loadCounter();
 
-// ── VOTES ─────────────────────────────────────────────────────────
-
-// Init votes doc if it doesn't exist, then listen
-  if (!snap.exists()) {
-  }
-  // Now listen for real-time updates
-    const d = snap.data() || { up: 0, down: 0 };
-    // re-apply active state on every snapshot (keeps it in sync)
-  });
-}
-
-    // Use setDoc with merge so it works even if doc somehow vanishes
-    showToast(type === 'up' ? '👍 Thanks for the vote!' : '👎 Noted — honesty helps us.');
-  } catch(e) {
-    // rollback
-    showToast('Vote failed — check connection.');
-  } finally {
-  }
-};
-
-// ── FORM SUBMIT ───────────────────────────────────────────────────
 window.submitForm = async function() {
   const name = document.getElementById('f_name').value.trim();
   const errEl = document.getElementById('ferr');
@@ -567,10 +546,7 @@ window.submitForm = async function() {
   btn.disabled = true;
   btn.textContent = 'Saving…';
   try {
-    await addDoc(collection(db, 'signups'), {
-      name,
-      timestamp: serverTimestamp()
-    });
+    await addDoc(collection(db, 'signups'), { name, timestamp: serverTimestamp() });
     document.getElementById('formWrap').style.display = 'none';
     document.getElementById('successWrap').style.display = 'block';
     showToast("🎉 You're on the waitlist!");
