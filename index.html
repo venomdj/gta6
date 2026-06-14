@@ -88,10 +88,9 @@ nav{
 
 /* PEOPLE INTERESTED */
 .ppl-interested{
-  display:flex;align-items:center;gap:10px;
+  display:flex;flex-direction:column;align-items:center;gap:8px;
   position:relative;z-index:1;
   margin-bottom:32px;
-  justify-content:center;
 }
 .cnum-inline{
   font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:28px;
@@ -99,6 +98,30 @@ nav{
   text-shadow:0 0 20px rgba(0,229,160,0.5),0 0 40px rgba(0,229,160,0.2);
 }
 .cnum-label{font-size:13px;color:var(--text3);letter-spacing:0.2px;}
+.live-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  margin-top:10px;
+  background:rgba(0,229,160,0.08);
+  border:1px solid rgba(0,229,160,0.2);
+  border-radius:100px;
+  padding:5px 12px;
+  font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;
+  color:var(--green);
+  box-shadow:0 0 12px rgba(0,229,160,0.1);
+  animation:fadein .6s ease;
+}
+.live-dot{
+  width:7px;height:7px;border-radius:50%;
+  background:var(--green);
+  box-shadow:0 0 0 0 rgba(0,229,160,0.6);
+  animation:livepulse 1.8s ease infinite;
+}
+@keyframes livepulse{
+  0%  {box-shadow:0 0 0 0 rgba(0,229,160,0.6);}
+  60% {box-shadow:0 0 0 6px rgba(0,229,160,0);}
+  100%{box-shadow:0 0 0 0 rgba(0,229,160,0);}
+}
+@keyframes fadein{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
 
 /* CONSOLE CARD */
 .console-card{
@@ -322,8 +345,14 @@ footer{
     <a href="#how" class="btn-ghost">See how it works ↓</a>
   </div>
   <div class="ppl-interested">
-    <span class="cnum-inline" id="cnt-signup">—</span>
-    <span class="cnum-label">people already interested</span>
+    <div style="display:flex;align-items:center;gap:10px;justify-content:center;">
+      <span class="cnum-inline" id="cnt-signup">—</span>
+      <span class="cnum-label">people already interested</span>
+    </div>
+    <div class="live-badge">
+      <div class="live-dot"></div>
+      Live — updating in real time
+    </div>
   </div>
   <div class="console-card">
     <div class="c-emoji">🎮</div>
