@@ -1,0 +1,1068 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RentPlay – Play GTA 6 on Day One</title>
+<meta name="description" content="Rent an Xbox Series X when GTA 6 drops. No ₹50,000 investment. Just pure next-gen gaming for 1–3 days.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+:root{
+  --bg:#06080c;
+  --bg2:#0b0f16;
+  --bg3:#111620;
+  --bg4:#171d28;
+  --border:rgba(255,255,255,0.06);
+  --border2:rgba(255,255,255,0.11);
+  --text:#eef0f4;
+  --text2:#8d97a8;
+  --text3:#4e5a6a;
+  --green:#00e5a0;
+  --green2:#00c488;
+  --greendim:rgba(0,229,160,0.1);
+  --greenglow:rgba(0,229,160,0.18);
+  --greenglow2:rgba(0,229,160,0.07);
+  --red:#ff4455;
+  --reddim:rgba(255,68,85,0.1);
+  --gold:#f5c842;
+  --r:10px;
+  --r2:16px;
+}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Instrument Sans',sans-serif;
+  font-size:16px;
+  line-height:1.65;
+  overflow-x:hidden;
+}
+
+/* ─── NAV ─── */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:200;
+  height:60px;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 clamp(16px,4%,48px);
+  background:rgba(6,8,12,0.8);
+  backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--border);
+}
+.logo{
+  font-family:'Syne',sans-serif;
+  font-weight:700;font-size:19px;letter-spacing:-0.3px;
+  color:var(--text);
+}
+.logo em{font-style:normal;color:var(--green);}
+.nav-pill{
+  display:flex;align-items:center;gap:7px;
+  padding:5px 13px;
+  background:var(--bg3);border:1px solid var(--border2);
+  border-radius:100px;
+  font-size:12px;font-weight:500;color:var(--text2);
+  letter-spacing:0.2px;
+}
+.blink{
+  width:6px;height:6px;border-radius:50%;
+  background:var(--green);
+  box-shadow:0 0 6px var(--green),0 0 12px rgba(0,229,160,0.5);
+  animation:blink 2s infinite;
+}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* ─── HERO ─── */
+.hero{
+  min-height:100vh;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;
+  padding:100px clamp(16px,6%,80px) 60px;
+  position:relative;
+  overflow:hidden;
+}
+/* Grid lines */
+.hero::before{
+  content:'';position:absolute;inset:0;
+  background-image:
+    linear-gradient(rgba(0,229,160,0.04) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(0,229,160,0.04) 1px,transparent 1px);
+  background-size:48px 48px;
+  mask-image:radial-gradient(ellipse 80% 70% at 50% 40%,black 20%,transparent 75%);
+  pointer-events:none;
+}
+/* Centre glow orb */
+.hero::after{
+  content:'';position:absolute;
+  top:30%;left:50%;transform:translate(-50%,-50%);
+  width:600px;height:400px;
+  background:radial-gradient(ellipse,rgba(0,229,160,0.07) 0%,transparent 70%);
+  pointer-events:none;
+}
+.eyebrow{
+  display:inline-flex;align-items:center;gap:7px;
+  font-size:11px;font-weight:600;letter-spacing:1.8px;text-transform:uppercase;
+  color:var(--green);
+  background:var(--greendim);
+  border:1px solid rgba(0,229,160,0.22);
+  padding:6px 15px;border-radius:100px;
+  margin-bottom:24px;
+  position:relative;z-index:1;
+}
+.hero h1{
+  font-family:'Syne',sans-serif;
+  font-weight:700;
+  font-size:clamp(28px,5.5vw,68px);
+  line-height:1.06;letter-spacing:-1.5px;
+  color:var(--text);
+  max-width:800px;
+  margin-bottom:22px;
+  position:relative;z-index:1;
+}
+.hero h1 .glow-word{
+  color:var(--green);
+  text-shadow:0 0 30px rgba(0,229,160,0.45),0 0 60px rgba(0,229,160,0.2);
+}
+.hero-sub{
+  font-size:clamp(14px,2vw,17px);
+  color:var(--text2);
+  max-width:500px;
+  line-height:1.75;
+  margin-bottom:36px;
+  position:relative;z-index:1;
+}
+/* ─── CTA ─── */
+.cta-row{
+  display:flex;align-items:center;justify-content:center;
+  gap:14px;flex-wrap:wrap;
+  position:relative;z-index:1;
+  margin-bottom:44px;
+}
+.btn-main{
+  display:inline-flex;align-items:center;gap:9px;
+  background:var(--green);
+  color:#04160e;
+  font-family:'Syne',sans-serif;
+  font-weight:700;font-size:15px;
+  padding:14px 30px;
+  border-radius:var(--r);border:none;cursor:pointer;
+  transition:all .2s;
+  box-shadow:0 0 24px rgba(0,229,160,0.3),0 0 60px rgba(0,229,160,0.12);
+  position:relative;overflow:hidden;
+  text-decoration:none;
+}
+.btn-main::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(255,255,255,0.12),transparent);
+  pointer-events:none;
+}
+.btn-main:hover{
+  background:#00f5ae;
+  box-shadow:0 0 36px rgba(0,229,160,0.5),0 0 80px rgba(0,229,160,0.2);
+  transform:translateY(-2px);
+}
+.btn-ghost{
+  display:inline-flex;align-items:center;gap:7px;
+  background:transparent;color:var(--text2);
+  font-size:14px;font-weight:500;
+  padding:13px 22px;
+  border-radius:var(--r);border:1px solid var(--border2);
+  cursor:pointer;transition:all .2s;
+  text-decoration:none;
+}
+.btn-ghost:hover{color:var(--text);background:var(--bg3);}
+
+/* ─── UPVOTE ─── */
+.vote-wrap{
+  display:flex;align-items:center;gap:10px;
+  position:relative;z-index:1;
+  justify-content:center;
+}
+.vote-box{
+  display:flex;align-items:center;gap:0;
+  background:var(--bg3);
+  border:1px solid var(--border2);
+  border-radius:var(--r);overflow:hidden;
+}
+.vote-btn{
+  display:flex;align-items:center;gap:6px;
+  background:none;border:none;cursor:pointer;
+  font-family:'Instrument Sans',sans-serif;
+  font-size:13px;font-weight:500;
+  padding:9px 16px;
+  transition:all .15s;
+  color:var(--text2);
+  position:relative;
+}
+.vote-btn:hover{background:var(--bg4);}
+.vote-btn.up:hover{color:var(--green);}
+.vote-btn.down:hover{color:var(--red);}
+.vote-btn.up.active{
+  color:var(--green);
+  background:var(--greendim);
+  text-shadow:0 0 10px rgba(0,229,160,0.4);
+}
+.vote-btn.down.active{color:var(--red);background:var(--reddim);}
+.vote-sep{width:1px;background:var(--border2);height:20px;flex-shrink:0;}
+.vote-icon{font-size:16px;line-height:1;}
+.vote-count{font-size:13px;min-width:16px;text-align:center;}
+.vote-label{font-size:12px;color:var(--text3);}
+
+/* ─── CONSOLE CARD ─── */
+.console-card{
+  display:flex;align-items:center;gap:20px;
+  background:var(--bg2);
+  border:1px solid rgba(0,229,160,0.18);
+  border-radius:var(--r2);
+  padding:24px 28px;
+  max-width:460px;
+  margin:0 auto;
+  position:relative;z-index:1;
+  box-shadow:0 0 40px rgba(0,229,160,0.06),inset 0 1px 0 rgba(255,255,255,0.05);
+}
+.console-card::before{
+  content:'';position:absolute;
+  top:0;left:20%;right:20%;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(0,229,160,0.4),transparent);
+}
+.c-emoji{font-size:52px;}
+.c-info{text-align:left;}
+.c-name{
+  font-family:'Syne',sans-serif;
+  font-weight:700;font-size:17px;color:var(--text);margin-bottom:4px;
+}
+.c-spec{font-size:12px;color:var(--text3);line-height:1.7;}
+.c-tag{
+  display:inline-flex;align-items:center;gap:5px;
+  margin-top:8px;
+  background:var(--greendim);
+  border:1px solid rgba(0,229,160,0.2);
+  color:var(--green);
+  font-size:11px;font-weight:600;
+  padding:3px 10px;border-radius:100px;
+  box-shadow:0 0 8px rgba(0,229,160,0.15);
+}
+
+/* ─── COUNTER BAR ─── */
+.cbar{
+  background:var(--bg2);
+  border-top:1px solid var(--border);
+  border-bottom:1px solid var(--border);
+  padding:24px clamp(16px,4%,48px);
+  display:flex;justify-content:center;
+  gap:clamp(24px,5vw,72px);
+  flex-wrap:wrap;
+}
+.citem{text-align:center;}
+.cnum{
+  display:block;
+  font-family:'Syne',sans-serif;
+  font-weight:700;font-size:clamp(26px,4vw,38px);
+  color:var(--green);line-height:1;margin-bottom:5px;
+  text-shadow:0 0 20px rgba(0,229,160,0.35);
+}
+.clabel{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:1.2px;}
+
+/* ─── SECTIONS ─── */
+.wrap{max-width:1080px;margin:0 auto;}
+.sec{padding:80px clamp(16px,4%,48px);}
+.sec-tag{
+  font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+  color:var(--green);margin-bottom:14px;
+}
+.sec-h{
+  font-family:'Syne',sans-serif;
+  font-weight:700;
+  font-size:clamp(22px,3.5vw,40px);
+  letter-spacing:-0.6px;line-height:1.13;
+  color:var(--text);margin-bottom:14px;
+}
+.sec-sub{font-size:15px;color:var(--text2);max-width:500px;line-height:1.75;}
+.rule{height:1px;background:var(--border);margin:0 clamp(16px,4%,48px);}
+
+/* ─── HOW IT WORKS ─── */
+.steps{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+  gap:1px;
+  background:var(--border);
+  border:1px solid var(--border);
+  border-radius:var(--r2);
+  overflow:hidden;
+  margin-top:48px;
+}
+.step{
+  background:var(--bg2);
+  padding:30px 24px;
+  transition:background .18s;
+}
+.step:hover{background:var(--bg3);}
+.step-n{
+  font-size:10px;font-weight:700;letter-spacing:1.5px;
+  color:var(--green);margin-bottom:16px;display:block;
+  text-shadow:0 0 10px rgba(0,229,160,0.3);
+}
+.step-ico{font-size:26px;margin-bottom:14px;display:block;}
+.step h3{
+  font-family:'Syne',sans-serif;font-weight:600;
+  font-size:15px;color:var(--text);margin-bottom:8px;
+}
+.step p{font-size:13px;color:var(--text2);line-height:1.65;}
+
+/* ─── COMPARE ─── */
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:48px;}
+.ccard{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:var(--r2);padding:30px 26px;
+}
+.ccard.yes{
+  border-color:rgba(0,229,160,0.25);
+  box-shadow:0 0 30px rgba(0,229,160,0.06),inset 0 1px 0 rgba(0,229,160,0.08);
+}
+.ccard .ctag{
+  font-size:10px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;
+  padding:4px 11px;border-radius:100px;margin-bottom:20px;display:inline-block;
+}
+.ccard.yes .ctag{background:var(--greendim);color:var(--green);}
+.ccard.no .ctag{background:var(--reddim);color:var(--red);}
+.ccard h3{
+  font-family:'Syne',sans-serif;font-weight:700;
+  font-size:19px;color:var(--text);margin-bottom:20px;
+}
+.clist{list-style:none;display:flex;flex-direction:column;gap:10px;}
+.clist li{
+  display:flex;align-items:flex-start;gap:9px;
+  font-size:13px;color:var(--text2);line-height:1.5;
+}
+.ci{
+  flex-shrink:0;width:16px;height:16px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:9px;margin-top:2px;
+}
+.ccard.yes .ci{background:var(--greendim);color:var(--green);}
+.ccard.no .ci{background:var(--reddim);color:var(--red);}
+
+/* ─── PRICING ─── */
+.pgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:48px;}
+.pcard{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:var(--r2);padding:28px 22px;
+  transition:border-color .2s;position:relative;
+}
+.pcard:hover{border-color:var(--border2);}
+.pcard.pop{
+  border-color:rgba(0,229,160,0.35);
+  box-shadow:0 0 40px rgba(0,229,160,0.08);
+}
+.pbadge{
+  position:absolute;top:-11px;left:50%;transform:translateX(-50%);
+  background:var(--green);color:#04160e;
+  font-family:'Syne',sans-serif;
+  font-size:10px;font-weight:700;letter-spacing:0.5px;
+  padding:3px 13px;border-radius:100px;white-space:nowrap;
+  box-shadow:0 0 12px rgba(0,229,160,0.4);
+}
+.pd{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;font-weight:600;margin-bottom:6px;}
+.pa{
+  font-family:'Syne',sans-serif;font-weight:700;
+  font-size:clamp(28px,3.5vw,38px);color:var(--text);
+  line-height:1;margin-bottom:3px;
+}
+.pa span{font-size:14px;font-weight:400;color:var(--text2);}
+.pp{font-size:11px;color:var(--text3);margin-bottom:22px;}
+.pinc{list-style:none;display:flex;flex-direction:column;gap:7px;}
+.pinc li{
+  font-size:12px;color:var(--text2);
+  display:flex;align-items:center;gap:7px;
+}
+.pinc li::before{content:'✓';color:var(--green);font-weight:700;font-size:11px;}
+
+/* ─── FAQ ─── */
+.flist{margin-top:48px;display:flex;flex-direction:column;gap:2px;}
+.fi{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:var(--r);overflow:hidden;
+}
+.fq{
+  padding:18px 22px;cursor:pointer;
+  display:flex;justify-content:space-between;align-items:center;
+  font-weight:500;font-size:14px;color:var(--text);
+  transition:background .15s;user-select:none;gap:12px;
+}
+.fq:hover{background:var(--bg3);}
+.farr{
+  font-size:17px;color:var(--text3);
+  transition:transform .25s;flex-shrink:0;
+}
+.fa{
+  padding:0 22px;max-height:0;overflow:hidden;
+  transition:max-height .3s ease,padding .3s;
+  font-size:13px;color:var(--text2);line-height:1.7;
+}
+.fi.open .fa{max-height:180px;padding:0 22px 18px;}
+.fi.open .farr{transform:rotate(180deg);}
+
+/* ─── TRUST ─── */
+.trow{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-top:48px;}
+.tcard{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:var(--r2);padding:24px 20px;
+  transition:border-color .2s,box-shadow .2s;
+}
+.tcard:hover{
+  border-color:rgba(0,229,160,0.18);
+  box-shadow:0 0 20px rgba(0,229,160,0.05);
+}
+.tico{font-size:24px;margin-bottom:12px;}
+.tcard h4{font-family:'Syne',sans-serif;font-weight:600;font-size:14px;color:var(--text);margin-bottom:6px;}
+.tcard p{font-size:12px;color:var(--text2);line-height:1.65;}
+
+/* ─── DISCLAIMER ─── */
+.disc{
+  background:rgba(245,200,66,0.05);
+  border:1px solid rgba(245,200,66,0.15);
+  border-radius:var(--r);padding:16px 18px;margin-top:36px;
+}
+.disc p{font-size:12px;color:rgba(245,200,66,0.65);line-height:1.65;}
+
+/* ─── FINAL CTA ─── */
+.fcta{text-align:center;padding-bottom:72px;}
+.glow-hr{
+  height:1px;
+  background:linear-gradient(90deg,transparent,rgba(0,229,160,0.3),transparent);
+  margin-bottom:72px;
+}
+
+/* ─── FOOTER ─── */
+footer{
+  max-width:1080px;margin:0 auto;
+  padding:32px clamp(16px,4%,48px);
+  border-top:1px solid var(--border);
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;
+}
+.flogo{font-family:'Syne',sans-serif;font-weight:700;font-size:17px;}
+.flogo em{font-style:normal;color:var(--green);}
+.fnote{font-size:11px;color:var(--text3);max-width:420px;line-height:1.6;}
+.admin-bar{
+  text-align:center;padding:12px;
+  border-top:1px solid var(--border);
+  background:var(--bg);
+}
+.admin-lnk{font-size:11px;color:var(--text3);cursor:pointer;background:none;border:none;}
+.admin-lnk:hover{color:var(--text2);}
+
+/* ─── MODAL ─── */
+.overlay{
+  position:fixed;inset:0;z-index:500;
+  background:rgba(0,0,0,0.88);
+  display:flex;align-items:center;justify-content:center;
+  padding:16px;
+  opacity:0;pointer-events:none;transition:opacity .22s;
+}
+.overlay.on{opacity:1;pointer-events:all;}
+.modal{
+  background:var(--bg2);
+  border:1px solid var(--border2);
+  border-radius:var(--r2);
+  width:100%;max-width:500px;
+  max-height:92vh;overflow-y:auto;
+  padding:clamp(22px,5vw,40px);
+  position:relative;
+  box-shadow:0 0 80px rgba(0,0,0,0.6),0 0 40px rgba(0,229,160,0.05);
+  transform:translateY(14px) scale(.97);
+  transition:transform .22s;
+}
+.modal::before{
+  content:'';position:absolute;top:0;left:15%;right:15%;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(0,229,160,0.35),transparent);
+}
+.overlay.on .modal{transform:translateY(0) scale(1);}
+.mclose{
+  position:absolute;top:14px;right:16px;
+  background:var(--bg3);border:1px solid var(--border);
+  color:var(--text2);font-size:18px;line-height:1;
+  width:30px;height:30px;border-radius:50%;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  transition:all .15s;
+}
+.mclose:hover{color:var(--text);background:var(--bg4);}
+.mh{
+  font-family:'Syne',sans-serif;
+  font-weight:700;font-size:20px;color:var(--text);margin-bottom:5px;
+}
+.ms{font-size:13px;color:var(--text2);margin-bottom:26px;}
+.fg{margin-bottom:15px;}
+.fg label{display:block;font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px;letter-spacing:0.3px;}
+.fg input,.fg select{
+  width:100%;background:var(--bg3);
+  border:1px solid var(--border2);
+  border-radius:var(--r);
+  padding:11px 14px;
+  color:var(--text);
+  font-family:'Instrument Sans',sans-serif;font-size:14px;
+  outline:none;transition:border-color .15s;
+  appearance:none;
+}
+.fg input:focus,.fg select:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(0,229,160,0.08);}
+.fg input::placeholder{color:var(--text3);}
+.fgrow{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.cbwrap{
+  display:flex;align-items:flex-start;gap:11px;
+  background:var(--bg3);border:1px solid var(--border2);
+  border-radius:var(--r);padding:13px 14px;
+  cursor:pointer;margin-bottom:22px;
+}
+.cbwrap input{
+  margin-top:2px;accent-color:var(--green);
+  width:15px;height:15px;flex-shrink:0;cursor:pointer;
+}
+.cbwrap label{font-size:13px;color:var(--text2);cursor:pointer;line-height:1.5;}
+.sub-btn{
+  width:100%;background:var(--green);color:#04160e;
+  font-family:'Syne',sans-serif;font-weight:700;font-size:15px;
+  padding:15px;border-radius:var(--r);border:none;cursor:pointer;
+  transition:all .18s;
+  box-shadow:0 0 20px rgba(0,229,160,0.25);
+}
+.sub-btn:hover{background:#00f5ae;box-shadow:0 0 30px rgba(0,229,160,0.4);}
+.sub-btn:disabled{opacity:.55;cursor:not-allowed;}
+.form-note{font-size:11px;color:var(--text3);text-align:center;margin-top:11px;}
+.err{font-size:12px;color:var(--red);margin-top:5px;display:none;}
+
+/* ─── SUCCESS ─── */
+.success{text-align:center;padding:16px 0;}
+.sico{font-size:48px;margin-bottom:14px;}
+.success h3{font-family:'Syne',sans-serif;font-weight:700;font-size:20px;color:var(--text);margin-bottom:8px;}
+.success p{font-size:14px;color:var(--text2);}
+
+/* ─── ADMIN ─── */
+.adm{
+  position:fixed;inset:0;z-index:600;
+  background:var(--bg);overflow-y:auto;
+  display:none;
+}
+.adm.on{display:block;}
+.adm-inner{max-width:1160px;margin:0 auto;padding:40px clamp(16px,4%,40px);}
+.adm-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:28px;flex-wrap:wrap;gap:12px;}
+.adm-top h1{font-family:'Syne',sans-serif;font-weight:700;font-size:22px;}
+.adm-acts{display:flex;gap:10px;}
+.btn-sm{
+  background:var(--bg3);color:var(--text2);
+  border:1px solid var(--border2);border-radius:8px;
+  padding:8px 15px;font-size:13px;font-family:'Instrument Sans',sans-serif;
+  cursor:pointer;transition:all .15s;white-space:nowrap;
+}
+.btn-sm:hover{color:var(--text);background:var(--bg4);}
+.mrow{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:28px;}
+.met{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:var(--r);padding:18px 16px;
+}
+.mv{
+  font-family:'Syne',sans-serif;font-weight:700;font-size:26px;
+  color:var(--green);
+  text-shadow:0 0 16px rgba(0,229,160,0.3);
+}
+.ml{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-top:3px;}
+.twrap{overflow-x:auto;border-radius:var(--r);border:1px solid var(--border);}
+table{width:100%;border-collapse:collapse;font-size:12px;}
+th{
+  background:var(--bg3);color:var(--text2);
+  font-weight:600;font-family:'Syne',sans-serif;
+  padding:11px 13px;text-align:left;
+  border-bottom:1px solid var(--border);white-space:nowrap;
+}
+td{padding:10px 13px;border-bottom:1px solid var(--border);color:var(--text2);vertical-align:middle;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:var(--bg3);}
+.by{background:var(--greendim);color:var(--green);padding:2px 9px;border-radius:100px;font-size:10px;font-weight:600;white-space:nowrap;}
+.bn{background:var(--reddim);color:var(--red);padding:2px 9px;border-radius:100px;font-size:10px;font-weight:600;}
+
+/* ─── TOAST ─── */
+.toast{
+  position:fixed;bottom:24px;right:24px;z-index:1000;
+  background:var(--bg3);border:1px solid var(--border2);
+  border-radius:var(--r);padding:12px 18px;
+  font-size:13px;color:var(--text);
+  box-shadow:0 0 30px rgba(0,0,0,0.5);
+  transform:translateY(60px);opacity:0;
+  transition:all .3s;pointer-events:none;
+  max-width:280px;
+}
+.toast.show{transform:translateY(0);opacity:1;}
+
+/* ─── MOBILE ─── */
+@media(max-width:640px){
+  .compare{grid-template-columns:1fr;}
+  .pgrid{grid-template-columns:1fr;}
+  .mrow{grid-template-columns:1fr 1fr;}
+  .fgrow{grid-template-columns:1fr;}
+  .steps{grid-template-columns:1fr 1fr;}
+  .hero h1{letter-spacing:-0.8px;}
+  .cta-row{flex-direction:column;align-items:stretch;}
+  .btn-main,.btn-ghost{justify-content:center;}
+  nav .nav-pill span{display:none;}
+  .adm-acts{flex-wrap:wrap;}
+  .vote-wrap{flex-direction:column;gap:8px;}
+}
+@media(max-width:380px){
+  .steps{grid-template-columns:1fr;}
+  .mrow{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">Rent<em>Play</em></div>
+  <div class="nav-pill"><div class="blink"></div><span>GTA 6 Launch Waitlist</span></div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="eyebrow">⚡ India's First Console Rental Waitlist</div>
+  <h1>Play GTA 6 on Day One<br><span class="glow-word">Without Buying a Console</span></h1>
+  <p class="hero-sub">Xbox Series X consoles may be available for rent when GTA 6 launches. No ₹50,000 investment — just pure next-gen for a weekend.</p>
+  <div class="cta-row">
+    <button class="btn-main" onclick="openModal()">🎮 I'm Interested — Reserve My Spot</button>
+    <a href="#how" class="btn-ghost">See how it works ↓</a>
+  </div>
+
+  <!-- UPVOTE / DOWNVOTE -->
+  <div class="vote-wrap">
+    <div class="vote-box">
+      <button class="vote-btn up" id="upBtn" onclick="vote('up')" title="I'd use this service">
+        <span class="vote-icon">👍</span>
+        <span class="vote-count" id="upCount">…</span>
+      </button>
+      <div class="vote-sep"></div>
+      <button class="vote-btn down" id="downBtn" onclick="vote('down')" title="Not for me">
+        <span class="vote-icon">👎</span>
+        <span class="vote-count" id="downCount">…</span>
+      </button>
+    </div>
+    <span class="vote-label">Would you use this?</span>
+  </div>
+
+  <!-- Console card -->
+  <div style="margin-top:44px;width:100%;display:flex;justify-content:center;">
+    <div class="console-card">
+      <div class="c-emoji">🎮</div>
+      <div class="c-info">
+        <div class="c-name">Xbox Series X</div>
+        <div class="c-spec">4K 120fps · 1TB SSD · Ray Tracing<br>Doorstep delivery · GTA 6 launch</div>
+        <div class="c-tag"><div class="blink"></div> Availability being planned</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COUNTER BAR -->
+<div class="cbar">
+  <div class="citem"><span class="cnum" id="cnt-signup">—</span><div class="clabel">People Interested</div></div>
+  <div class="citem"><span class="cnum" id="cnt-pay">—</span><div class="clabel">Would Pay ₹1,500–2k</div></div>
+  <div class="citem"><span class="cnum" id="cnt-city">—</span><div class="clabel">Cities Represented</div></div>
+</div>
+
+<div class="wrap">
+
+<!-- HOW IT WORKS -->
+<section class="sec" id="how">
+  <div class="sec-tag">The Process</div>
+  <h2 class="sec-h">From waitlist to your living room</h2>
+  <p class="sec-sub">Validating demand now so we can confirm rental availability when GTA 6 actually drops.</p>
+  <div class="steps">
+    <div class="step"><span class="step-n">STEP 01</span><span class="step-ico">✋</span><h3>Join the Waitlist</h3><p>Express interest, share your city and rental preference. No payment now.</p></div>
+    <div class="step"><span class="step-n">STEP 02</span><span class="step-ico">📩</span><h3>Get Confirmation</h3><p>WhatsApp message 48h before GTA 6 release with your city's availability and booking link.</p></div>
+    <div class="step"><span class="step-n">STEP 03</span><span class="step-ico">🚚</span><h3>Console Delivered</h3><p>Xbox Series X with controller at your door on launch day — sanitised, set up, ready to play.</p></div>
+    <div class="step"><span class="step-n">STEP 04</span><span class="step-ico">🎮</span><h3>Play, Then Return</h3><p>Return within your rental window. No long-term commitment, no storage, no hassle.</p></div>
+  </div>
+</section>
+
+<div class="rule"></div>
+
+<!-- WHY RENT -->
+<section class="sec">
+  <div class="sec-tag">The Decision</div>
+  <h2 class="sec-h">Why rent instead of buy?</h2>
+  <p class="sec-sub">For most people, the math is obvious. Owning a console you use 10 days a year isn't ownership — it's storage.</p>
+  <div class="compare">
+    <div class="ccard yes">
+      <div class="ctag">✓ Renting via RentPlay</div>
+      <h3>₹1,500 for the weekend</h3>
+      <ul class="clist">
+        <li><span class="ci">✓</span>Play GTA 6 day one with zero wait</li>
+        <li><span class="ci">✓</span>No ₹50,000 upfront investment</li>
+        <li><span class="ci">✓</span>Console delivered to your door</li>
+        <li><span class="ci">✓</span>Sanitised, tested, ready to play</li>
+        <li><span class="ci">✓</span>Return when done, no storage</li>
+        <li><span class="ci">✓</span>Perfect for one-time gaming events</li>
+      </ul>
+    </div>
+    <div class="ccard no">
+      <div class="ctag">✗ Buying an Xbox Series X</div>
+      <h3>₹45,000–54,990 up front</h3>
+      <ul class="clist">
+        <li><span class="ci">✗</span>30× more expensive for occasional use</li>
+        <li><span class="ci">✗</span>Can take weeks to arrive by launch day</li>
+        <li><span class="ci">✗</span>Depreciation starts immediately</li>
+        <li><span class="ci">✗</span>GTA 6 game adds another ₹3,000+</li>
+        <li><span class="ci">✗</span>Resale value drops fast</li>
+        <li><span class="ci">✗</span>Collects dust between gaming sessions</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<div class="rule"></div>
+
+<!-- PRICING -->
+<section class="sec">
+  <div class="sec-tag">Estimated Pricing</div>
+  <h2 class="sec-h">Clear, honest pricing</h2>
+  <p class="sec-sub">Target rates based on market research. Final pricing confirmed at launch.</p>
+  <div class="pgrid">
+    <div class="pcard">
+      <div class="pd">1 Day</div>
+      <div class="pa">₹1,500 <span>/ day</span></div>
+      <div class="pp">₹1,500 total</div>
+      <ul class="pinc">
+        <li>Xbox Series X console</li>
+        <li>1 controller included</li>
+        <li>Delivery &amp; pickup</li>
+        <li>WhatsApp setup support</li>
+      </ul>
+    </div>
+    <div class="pcard pop">
+      <div class="pbadge">Most Popular</div>
+      <div class="pd">2 Days</div>
+      <div class="pa">₹1,400 <span>/ day</span></div>
+      <div class="pp">₹2,800 total · save ₹200</div>
+      <ul class="pinc">
+        <li>Xbox Series X console</li>
+        <li>1 controller included</li>
+        <li>Delivery &amp; pickup</li>
+        <li>WhatsApp setup support</li>
+        <li>Extra controller +₹300</li>
+      </ul>
+    </div>
+    <div class="pcard">
+      <div class="pd">3 Days</div>
+      <div class="pa">₹1,200 <span>/ day</span></div>
+      <div class="pp">₹3,600 total · save ₹900</div>
+      <ul class="pinc">
+        <li>Xbox Series X console</li>
+        <li>1 controller included</li>
+        <li>Delivery &amp; pickup</li>
+        <li>WhatsApp setup support</li>
+        <li>Extra controller +₹300</li>
+        <li>Priority for next launch</li>
+      </ul>
+    </div>
+  </div>
+  <div class="disc">
+    <p>⚠️ <strong>Heads up:</strong> RentPlay is currently in market-validation mode. No consoles purchased yet. This waitlist helps gauge genuine demand before investing. Joining expresses interest only — no payment taken, no booking guaranteed. We'll confirm availability closer to GTA 6's launch.</p>
+  </div>
+</section>
+
+<div class="rule"></div>
+
+<!-- FAQ -->
+<section class="sec">
+  <div class="sec-tag">Questions</div>
+  <h2 class="sec-h">Things people ask</h2>
+  <div class="flist">
+    <div class="fi"><div class="fq" onclick="faq(this)"><span>Is GTA 6 actually confirmed for Xbox Series X?</span><span class="farr">↓</span></div><div class="fa">Yes. Rockstar confirmed GTA 6 for PS5 and Xbox Series X/S. A PC version follows later. We're planning around the console launch.</div></div>
+    <div class="fi"><div class="fq" onclick="faq(this)"><span>Do I need to pay anything now?</span><span class="farr">↓</span></div><div class="fa">Absolutely not. Joining the waitlist is free. You're expressing interest only. We'll contact you when availability is confirmed and you decide then.</div></div>
+    <div class="fi"><div class="fq" onclick="faq(this)"><span>Which cities will you serve at launch?</span><span class="farr">↓</span></div><div class="fa">Decisions based on where waitlist demand is highest. Sign up early — you vote with your registration. If your city has enough interest, you'll be covered.</div></div>
+    <div class="fi"><div class="fq" onclick="faq(this)"><span>How will I get the console?</span><span class="farr">↓</span></div><div class="fa">Doorstep delivery. For launch day bookings we aim to deliver by early morning. Logistics confirmed closer to the release date.</div></div>
+    <div class="fi"><div class="fq" onclick="faq(this)"><span>What if the console gets damaged?</span><span class="farr">↓</span></div><div class="fa">Minor scratches are expected and covered. For significant damage a fee applies. A refundable security deposit may be taken at booking. Full terms shared before any payment.</div></div>
+    <div class="fi"><div class="fq" onclick="faq(this)"><span>What if GTA 6 gets delayed again?</span><span class="farr">↓</span></div><div class="fa">We track announcements closely. If delayed, waitlist status auto-extends and we'll reach out with updated timelines. Zero risk in being on the list.</div></div>
+  </div>
+</section>
+
+<div class="rule"></div>
+
+<!-- TRUST -->
+<section class="sec">
+  <div class="sec-tag">Why Trust Us</div>
+  <h2 class="sec-h">We're being upfront about everything</h2>
+  <div class="trow">
+    <div class="tcard"><div class="tico">🔍</div><h4>Honest about our stage</h4><p>We're validating demand before investing. A waitlist, not a checkout. No money changes hands now.</p></div>
+    <div class="tcard"><div class="tico">📱</div><h4>WhatsApp-first</h4><p>Every update via WhatsApp. If demand doesn't justify launch, you'll hear from us 48h in advance.</p></div>
+    <div class="tcard"><div class="tico">🔒</div><h4>Your data is private</h4><p>We never sell or share contact info. Ask us to delete your data anytime, no questions asked.</p></div>
+    <div class="tcard"><div class="tico">📍</div><h4>Starting local</h4><p>Beginning with a few cities to ensure quality. More cities added based on waitlist demand.</p></div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="sec fcta">
+  <div class="glow-hr"></div>
+  <div class="sec-tag">Join the Waitlist</div>
+  <h2 class="sec-h" style="margin-bottom:12px;">GTA 6 drops once.<br>Be ready for it.</h2>
+  <p class="sec-sub" style="margin:0 auto 32px;">60 seconds. No payment. No commitment.</p>
+  <button class="btn-main" onclick="openModal()" style="font-size:16px;padding:16px 36px;">🎮 Reserve My Spot</button>
+</section>
+
+</div><!-- /wrap -->
+
+<footer>
+  <div class="flogo">Rent<em>Play</em></div>
+  <div class="fnote">Pre-launch market validation. No consoles purchased yet. Data collected with consent, never sold. RentPlay 2025.</div>
+</footer>
+
+
+<!-- ─── MODAL ─── -->
+<div class="overlay" id="overlay" onclick="bgClose(event)">
+  <div class="modal">
+    <button class="mclose" onclick="closeModal()">×</button>
+    <div id="formWrap">
+      <div class="mh">🎮 Claim Your Spot</div>
+      <div class="ms">Drop your name and we'll reach out when GTA 6 availability is confirmed.</div>
+      <div class="fg"><label>Your Name *</label><input id="f_name" placeholder="Arjun Sharma" autocomplete="name"></div>
+      <div id="formErr" class="err">Please enter your name.</div>
+      <button class="sub-btn" id="subBtn" onclick="submitForm()">Reserve My Spot →</button>
+      <div class="form-note">No payment taken. Remove yourself anytime.</div>
+    </div>
+    <div id="successWrap" class="success" style="display:none">
+      <div class="sico">🎉</div>
+      <h3>You're on the list!</h3>
+      <p>We'll WhatsApp you when availability in your city is confirmed.<br>Get ready for GTA 6 day one.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ─── ADMIN ─── -->
+<div class="adm" id="admPanel">
+  <div class="adm-inner">
+    <div class="adm-top">
+      <h1>RentPlay Admin</h1>
+      <div class="adm-acts">
+        <button class="btn-sm" onclick="exportCSV()">⬇ Export CSV</button>
+        <button class="btn-sm" onclick="closeAdmin()">← Back to Site</button>
+      </div>
+    </div>
+    <div class="mrow" id="admMetrics"></div>
+    <div class="twrap">
+      <table>
+        <thead><tr><th>#</th><th>Name</th><th>Email</th><th>WhatsApp</th><th>City</th><th>Duration</th><th>Will Pay?</th><th>Submitted</th></tr></thead>
+        <tbody id="admBody"><tr><td colspan="8" style="text-align:center;padding:40px;color:var(--text3)">Loading…</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ─── TOAST ─── -->
+<div class="toast" id="toast"></div>
+
+<!-- Firebase -->
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+import { getFirestore, collection, addDoc, getDocs, doc, getDoc, setDoc, updateDoc, increment, serverTimestamp, onSnapshot, query, orderBy }
+  from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+
+// ── FIREBASE CONFIG ──────────────────────────────────────────────
+// 🔴 REPLACE WITH YOUR FIREBASE CONFIG 🔴
+const firebaseConfig = {
+  apiKey: "AIzaSyDRRvC4hA2V4OzsMQdAc4w8IPBS73IDfDQ",
+  authDomain: "gta6-bbcb5.firebaseapp.com",
+  databaseURL: "https://gta6-bbcb5-default-rtdb.firebaseio.com",
+  projectId: "gta6-bbcb5",
+  storageBucket: "gta6-bbcb5.firebasestorage.app",
+  messagingSenderId: "483183473019",
+  appId: "1:483183473019:web:3da57a198c3a1d7c8f4dde",
+  measurementId: "G-3DGKH6BHRY"
+};
+// ─────────────────────────────────────────────────────────────────
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// ── COUNTERS ─────────────────────────────────────────────────────
+window._db = db;
+
+async function loadCounters() {
+  try {
+    const snap = await getDocs(collection(db, 'signups'));
+    const docs = snap.docs.map(d => d.data());
+    document.getElementById('cnt-signup').textContent = docs.length;
+    document.getElementById('cnt-pay').textContent = '—';
+    document.getElementById('cnt-city').textContent = '—';
+  } catch(e) {
+    document.getElementById('cnt-signup').textContent = '0';
+    document.getElementById('cnt-pay').textContent = '—';
+    document.getElementById('cnt-city').textContent = '—';
+  }
+}
+
+// ── VOTES ─────────────────────────────────────────────────────────
+const VOTE_DOC = 'votes/global';
+let userVote = localStorage.getItem('rentplay_vote') || null;
+
+async function loadVotes() {
+  try {
+    const ref = doc(db, 'votes', 'global');
+    const snap = await getDoc(ref);
+    const data = snap.exists() ? snap.data() : { up: 0, down: 0 };
+    document.getElementById('upCount').textContent = data.up || 0;
+    document.getElementById('downCount').textContent = data.down || 0;
+    renderVoteState();
+  } catch {
+    document.getElementById('upCount').textContent = '?';
+    document.getElementById('downCount').textContent = '?';
+  }
+}
+
+function renderVoteState() {
+  document.getElementById('upBtn').classList.toggle('active', userVote === 'up');
+  document.getElementById('downBtn').classList.toggle('active', userVote === 'down');
+}
+
+window.vote = async function(type) {
+  if (userVote === type) return; // already voted this
+  try {
+    const ref = doc(db, 'votes', 'global');
+    const snap = await getDoc(ref);
+    if (!snap.exists()) {
+      await setDoc(ref, { up: 0, down: 0 });
+    }
+    const updates = {};
+    updates[type] = increment(1);
+    if (userVote && userVote !== type) {
+      updates[userVote] = increment(-1); // remove old vote
+    }
+    await updateDoc(ref, updates);
+    userVote = type;
+    localStorage.setItem('rentplay_vote', type);
+    await loadVotes();
+    showToast(type === 'up' ? '👍 Thanks for the vote!' : '👎 Noted, we appreciate honesty.');
+  } catch(e) {
+    showToast('Could not record vote. Check Firebase config.');
+  }
+};
+
+// ── FORM SUBMIT ───────────────────────────────────────────────────
+window.submitForm = async function() {
+  const name = document.getElementById('f_name').value.trim();
+  const errEl = document.getElementById('formErr');
+
+  if (!name) {
+    errEl.style.display = 'block';
+    return;
+  }
+  errEl.style.display = 'none';
+
+  const btn = document.getElementById('subBtn');
+  btn.disabled = true;
+  btn.textContent = 'Submitting…';
+
+  try {
+    await addDoc(collection(db, 'signups'), {
+      name,
+      timestamp: serverTimestamp()
+    });
+
+    document.getElementById('formWrap').style.display = 'none';
+    document.getElementById('successWrap').style.display = 'block';
+    loadCounters();
+    showToast('🎉 You\'re on the waitlist!');
+
+    document.getElementById('f_name').value = '';
+  } catch(e) {
+    showToast('Error saving. Check Firebase config.');
+    btn.disabled = false;
+    btn.textContent = 'Reserve My Spot →';
+  }
+};
+
+// ── ADMIN ─────────────────────────────────────────────────────────
+window.openAdmin = function() {
+  document.getElementById('admPanel').classList.add('on');
+  renderAdmin();
+};
+window.closeAdmin = function() {
+  document.getElementById('admPanel').classList.remove('on');
+};
+
+async function renderAdmin() {
+  const snap = await getDocs(query(collection(db, 'signups'), orderBy('timestamp', 'desc')));
+  const docs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  const willPay = docs.filter(d => d.willPay).length;
+  const cities = new Set(docs.map(d => (d.city||'').toLowerCase().trim()).filter(Boolean)).size;
+  const rate = docs.length ? Math.round((willPay / docs.length) * 100) : 0;
+
+  document.getElementById('admMetrics').innerHTML = `
+    <div class="met"><div class="mv">${docs.length}</div><div class="ml">Total Signups</div></div>
+    <div class="met"><div class="mv">${willPay}</div><div class="ml">Will Pay</div></div>
+    <div class="met"><div class="mv">${cities}</div><div class="ml">Cities</div></div>
+    <div class="met"><div class="mv">${rate}%</div><div class="ml">Intent Rate</div></div>
+  `;
+
+  window._admData = docs;
+  const body = document.getElementById('admBody');
+  if (!docs.length) {
+    body.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:40px;color:var(--text3)">No submissions yet.</td></tr>';
+    return;
+  }
+  body.innerHTML = docs.map((d, i) => {
+    const ts = d.timestamp?.toDate ? d.timestamp.toDate().toLocaleString('en-IN',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}) : '—';
+    return `<tr>
+      <td style="color:var(--text3)">${i+1}</td>
+      <td style="color:var(--text);font-weight:500">${esc(d.name)}</td>
+      <td>${esc(d.email)}</td>
+      <td>${esc(d.whatsapp)}</td>
+      <td>${esc(d.city)}</td>
+      <td>${d.duration} day${d.duration==='1'?'':d.duration==='Not specified'?'':'s'}</td>
+      <td>${d.willPay ? '<span class="by">✓ Yes</span>' : '<span class="bn">✗ No</span>'}</td>
+      <td>${ts}</td>
+    </tr>`;
+  }).join('');
+}
+
+window.exportCSV = function() {
+  const docs = window._admData || [];
+  if (!docs.length) { showToast('No data to export.'); return; }
+  const h = ['#','Name','Email','WhatsApp','City','Duration','Will Pay','Submitted'];
+  const rows = docs.map((d,i) => [
+    i+1, d.name, d.email, d.whatsapp, d.city, d.duration,
+    d.willPay ? 'Yes' : 'No',
+    d.timestamp?.toDate ? d.timestamp.toDate().toLocaleString() : ''
+  ]);
+  const csv = [h,...rows].map(r => r.map(v => `"${String(v||'').replace(/"/g,'""')}"`).join(',')).join('\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.download = `rentplay_${new Date().toISOString().split('T')[0]}.csv`;
+  a.click();
+};
+
+// ── INIT ─────────────────────────────────────────────────────────
+loadCounters();
+loadVotes();
+</script>
+
+<script>
+function openModal(){
+  document.getElementById('overlay').classList.add('on');
+  document.body.style.overflow='hidden';
+}
+function closeModal(){
+  document.getElementById('overlay').classList.remove('on');
+  document.body.style.overflow='';
+  document.getElementById('formWrap').style.display='';
+  document.getElementById('successWrap').style.display='none';
+}
+function bgClose(e){ if(e.target===document.getElementById('overlay')) closeModal(); }
+function faq(el){ el.parentElement.classList.toggle('open'); }
+
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeModal(); });
+</script>
+</body>
+</html>
