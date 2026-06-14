@@ -88,19 +88,37 @@ nav{
 .vote-wrap{display:flex;align-items:center;gap:10px;position:relative;z-index:1;justify-content:center;}
 .vote-box{display:flex;align-items:center;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);overflow:hidden;}
 .vote-btn{
-  display:flex;align-items:center;gap:6px;background:none;border:none;cursor:pointer;
-  font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;padding:9px 16px;
-  transition:all .15s;color:var(--text2);
+  display:flex;align-items:center;gap:7px;background:none;border:none;cursor:pointer;
+  font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:600;
+  padding:10px 20px;color:var(--text2);
+  transition:background .15s,color .15s,box-shadow .15s;
+  will-change:transform;
+  user-select:none;
 }
-.vote-btn:hover{background:var(--bg4);}
-.vote-btn.up:hover{color:var(--green);}
-.vote-btn.down:hover{color:var(--red);}
-.vote-btn.up.active{color:var(--green);background:var(--greendim);text-shadow:0 0 10px rgba(0,229,160,0.4);}
-.vote-btn.down.active{color:var(--red);background:var(--reddim);}
-.vote-sep{width:1px;background:var(--border2);height:20px;flex-shrink:0;}
+.vote-btn:not(.active):hover{background:var(--bg4);}
+.vote-btn.up:not(.active):hover{color:var(--green);}
+.vote-btn.down:not(.active):hover{color:var(--red);}
+.vote-btn.up.active{
+  color:var(--green);background:var(--greendim);
+  box-shadow:inset 0 0 0 1px rgba(0,229,160,0.25);
+}
+.vote-btn.down.active{
+  color:var(--red);background:var(--reddim);
+  box-shadow:inset 0 0 0 1px rgba(255,68,85,0.25);
+}
+.vote-btn.up.active .ve{filter:drop-shadow(0 0 5px rgba(0,229,160,0.9));}
+.vote-btn.down.active .ve{filter:drop-shadow(0 0 5px rgba(255,68,85,0.9));}
+.ve{font-size:17px;line-height:1;display:inline-block;transition:filter .2s;}
+.vote-sep{width:1px;background:var(--border2);height:22px;flex-shrink:0;}
 .vote-label{font-size:12px;color:var(--text3);}
-@keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.28)}70%{transform:scale(0.92)}100%{transform:scale(1)}}
-.vote-btn.pop{animation:pop .3s cubic-bezier(.36,.07,.19,.97) both;}
+@keyframes pop{
+  0%  {transform:scale(1)}
+  25% {transform:scale(1.25)}
+  55% {transform:scale(0.92)}
+  75% {transform:scale(1.07)}
+  100%{transform:scale(1)}
+}
+.vote-btn.pop{animation:pop .38s cubic-bezier(.36,.07,.19,.97) both;}
 
 /* CONSOLE CARD */
 .console-card{
@@ -327,11 +345,11 @@ footer{
   <div class="vote-wrap">
     <div class="vote-box">
       <button class="vote-btn up" id="upBtn" onclick="vote('up')" title="I'd use this">
-        <span>👍</span><span id="upCount">…</span>
+        <span class="ve">👍</span><span id="upCount">0</span>
       </button>
       <div class="vote-sep"></div>
       <button class="vote-btn down" id="downBtn" onclick="vote('down')" title="Not for me">
-        <span>👎</span><span id="downCount">…</span>
+        <span class="ve">👎</span><span id="downCount">0</span>
       </button>
     </div>
     <span class="vote-label">Would you use this?</span>
@@ -528,72 +546,107 @@ footer{
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
 import {
-  getDatabase, ref, set, get, update, increment, push, onValue
-} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js';
+  getFirestore, collection, addDoc, getCountFromServer,
+  doc, getDoc, setDoc, updateDoc, increment, serverTimestamp, onSnapshot
+} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 
 const firebaseConfig = {
   apiKey: "AIzaSyDRRvC4hA2V4OzsMQdAc4w8IPBS73IDfDQ",
   authDomain: "gta6-bbcb5.firebaseapp.com",
-  databaseURL: "https://gta6-bbcb5-default-rtdb.firebaseio.com",
   projectId: "gta6-bbcb5",
   storageBucket: "gta6-bbcb5.firebasestorage.app",
   messagingSenderId: "483183473019",
-  appId: "1:483183473019:web:3da57a198c3a1d7c8f4dde",
-  measurementId: "G-3DGKH6BHRY"
+  appId: "1:483183473019:web:3da57a198c3a1d7c8f4dde"
 };
 
 const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
+const db = getFirestore(app);
 
-// ── LIVE COUNTER (real-time listener) ────────────────────────────
-onValue(ref(db, 'meta/signupCount'), snap => {
-  document.getElementById('cnt-signup').textContent = snap.val() || 0;
-});
+// ── LIVE COUNTER ──────────────────────────────────────────────────
+async function loadCounter() {
+  try {
+    const snap = await getCountFromServer(collection(db, 'signups'));
+    document.getElementById('cnt-signup').textContent = snap.data().count;
+  } catch(e) {
+    document.getElementById('cnt-signup').textContent = '0';
+  }
+}
+loadCounter();
 
-// ── LIVE VOTES (real-time listener) ──────────────────────────────
+// ── LIVE VOTES ────────────────────────────────────────────────────
 let userVote = localStorage.getItem('rentplay_vote') || null;
 
-onValue(ref(db, 'votes'), snap => {
-  const data = snap.val() || { up: 0, down: 0 };
-  animateCount('upCount', parseInt(document.getElementById('upCount').dataset.val || 0), data.up || 0);
-  animateCount('downCount', parseInt(document.getElementById('downCount').dataset.val || 0), data.down || 0);
-  document.getElementById('upCount').dataset.val = data.up || 0;
-  document.getElementById('downCount').dataset.val = data.down || 0;
-  document.getElementById('upBtn').classList.toggle('active', userVote === 'up');
-  document.getElementById('downBtn').classList.toggle('active', userVote === 'down');
+const votesRef = doc(db, 'votes', 'global');
+
+// ensure votes doc exists then listen
+getDoc(votesRef).then(snap => {
+  if (!snap.exists()) setDoc(votesRef, { up: 0, down: 0 });
 });
 
-function animateCount(id, from, to) {
+// track running animations to cancel them
+const _anims = {};
+
+function setCount(id, to) {
   const el = document.getElementById(id);
-  if (from === to) { el.textContent = to; return; }
-  const diff = to - from;
-  const duration = 400;
+  const from = parseInt(el.textContent) || 0;
+  if (from === to) return;
+  if (_anims[id]) cancelAnimationFrame(_anims[id]);
+  const duration = 300;
   const start = performance.now();
-  requestAnimationFrame(function step(now) {
+  function step(now) {
     const p = Math.min((now - start) / duration, 1);
-    el.textContent = Math.round(from + diff * p);
-    if (p < 1) requestAnimationFrame(step);
-  });
+    const ease = 1 - Math.pow(1 - p, 3); // ease out cubic
+    el.textContent = Math.round(from + (to - from) * ease);
+    if (p < 1) _anims[id] = requestAnimationFrame(step);
+    else { el.textContent = to; delete _anims[id]; }
+  }
+  _anims[id] = requestAnimationFrame(step);
 }
 
-// ── VOTE ─────────────────────────────────────────────────────────
-window.vote = async function(type) {
-  if (userVote === type) return;
-  const btn = document.getElementById(type === 'up' ? 'upBtn' : 'downBtn');
+function applyVoteUI(data) {
+  setCount('upCount', data.up || 0);
+  setCount('downCount', data.down || 0);
+  document.getElementById('upBtn').classList.toggle('active', userVote === 'up');
+  document.getElementById('downBtn').classList.toggle('active', userVote === 'down');
+}
 
-  // pop animation
+onSnapshot(votesRef, snap => {
+  applyVoteUI(snap.exists() ? snap.data() : { up: 0, down: 0 });
+});
+
+// ── VOTE ──────────────────────────────────────────────────────────
+let voting = false;
+window.vote = async function(type) {
+  if (userVote === type || voting) return;
+  voting = true;
+
+  // optimistic UI update immediately
+  const prevVote = userVote;
+  userVote = type;
+  document.getElementById('upBtn').classList.toggle('active', type === 'up');
+  document.getElementById('downBtn').classList.toggle('active', type === 'down');
+
+  // pop only the clicked button
+  const btn = document.getElementById(type === 'up' ? 'upBtn' : 'downBtn');
+  btn.classList.remove('pop');
+  void btn.offsetWidth; // force reflow so animation restarts clean
   btn.classList.add('pop');
-  setTimeout(() => btn.classList.remove('pop'), 300);
+  btn.addEventListener('animationend', () => btn.classList.remove('pop'), { once: true });
 
   try {
-    const updates = { [`votes/${type}`]: increment(1) };
-    if (userVote) updates[`votes/${userVote}`] = increment(-1);
-    await update(ref(db), updates);
-    userVote = type;
+    const updates = { [type]: increment(1) };
+    if (prevVote) updates[prevVote] = increment(-1);
+    await updateDoc(votesRef, updates);
     localStorage.setItem('rentplay_vote', type);
     showToast(type === 'up' ? '👍 Thanks for the vote!' : '👎 Noted — honesty helps us.');
   } catch(e) {
+    // rollback optimistic update
+    userVote = prevVote;
+    document.getElementById('upBtn').classList.toggle('active', prevVote === 'up');
+    document.getElementById('downBtn').classList.toggle('active', prevVote === 'down');
     showToast('Vote failed: ' + e.message);
+  } finally {
+    voting = false;
   }
 };
 
@@ -603,25 +656,19 @@ window.submitForm = async function() {
   const errEl = document.getElementById('ferr');
   if (!name) { errEl.style.display = 'block'; return; }
   errEl.style.display = 'none';
-
   const btn = document.getElementById('subBtn');
   btn.disabled = true;
   btn.textContent = 'Saving…';
-
   try {
-    // Write signup entry
-    const newRef = push(ref(db, 'signups'));
-    await set(newRef, {
+    await addDoc(collection(db, 'signups'), {
       name,
-      timestamp: Date.now()
+      timestamp: serverTimestamp()
     });
-    // Increment counter atomically
-    await update(ref(db, 'meta'), { signupCount: increment(1) });
-
     document.getElementById('formWrap').style.display = 'none';
     document.getElementById('successWrap').style.display = 'block';
     showToast("🎉 You're on the waitlist!");
     document.getElementById('f_name').value = '';
+    loadCounter();
   } catch(e) {
     errEl.textContent = 'Error: ' + e.message;
     errEl.style.display = 'block';
